@@ -1,0 +1,30 @@
+{
+  "name": "angular-rails-s3-upload",
+  "version": "0.1.0",
+  "authors": [
+    "Pavel Khrulev <paulschuher@gmail.com>"
+  ],
+  "description": "Directive for direct s3-uploading in rails + angular apps",
+  "keywords": [
+    "angular",
+    "s3",
+    "rails",
+    "uploading"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "main": "s3-uploader.js",
+  "dependencies": {
+    "angular": "latest",
+    "aws-sdk-js": "latest",
+    "angular-random-string": "latest",
+    "angular-file-upload": "latest"
+  }
+}
