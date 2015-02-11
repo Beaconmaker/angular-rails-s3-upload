@@ -1,6 +1,6 @@
 {
   "name": "angular-rails-s3-upload",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Pavel Khrulev <paulschuher@gmail.com>"
   ],
@@ -22,7 +22,7 @@
   ],
   "main": "s3-uploader.js",
   "dependencies": {
-    "angular": "latest",
+    "angular": "1.3.7",
     "aws-sdk-js": "latest",
     "angular-random-string": "latest",
     "angular-file-upload": "latest"

@@ -58,12 +58,14 @@
         require: 'ngModel',
         restrict: 'A',
         scope: {
-          model: '=ngModel'
+          model: '=ngModel',
+          afterUpload: '&afterFileUpload'
         },
         link: function(scope, elem, attrs) {
-          var fieldName, isDrop;
+          var fieldName, getProgress, isDrop, isMultiple, setProgress, _ref;
           scope.file = null;
           isDrop = angular.isDefined(attrs.dragdrop);
+          isMultiple = angular.isDefined(attrs.multiple);
           if (isDrop) {
             elem.attr('ng-file-drop', '');
             elem.attr('allowDir', 'false');
@@ -71,28 +73,76 @@
             elem.attr('ng-file-select', '');
           }
           elem.removeAttr('remote-upload');
+          elem.removeAttr('multiple');
           elem.attr('ng-model', 'file');
-          elem.attr('accept', 'image/*');
-          elem.attr('ng-multiple', 'false');
+          if (!elem.attr('accept')) {
+            elem.attr('accept', 'image/*');
+          }
+          elem.attr('ng-multiple', (_ref = isMultiple) != null ? _ref : {
+            'true': 'false'
+          });
           $compile(elem)(scope);
           fieldName = $parse(attrs.name);
-          return scope.$watch('file', function(value) {
-            if (value) {
-              fieldName.assign(scope.$parent, {
-                progress: 0
-              });
-              return S3Uploader.upload(value[0]).then(function(filename) {
-                return scope.model = filename;
-              }, function(rejection) {
-                return fieldName.assign(scope.$parent, {
-                  error: rejection,
+          setProgress = function(progress_obj) {
+            return fieldName.assign(scope.$parent, progress_obj);
+          };
+          getProgress = function() {
+            return fieldName(scope.$parent);
+          };
+          return scope.$watch('file', function(values) {
+            if (values) {
+              if (isMultiple) {
+                if (!angular.isArray(scope.model)) {
+                  scope.model = [];
+                }
+                angular.forEach(values, function(value) {
+                  scope.model.push({
+                    file: value,
+                    file_name: value.name,
+                    upload_progress: 0,
+                    file_uploading: true
+                  });
+                  return value.fileQueue = scope.model.length;
+                });
+                return angular.forEach(values, function(value) {
+                  var fileIndex;
+                  fileIndex = value.fileQueue - 1;
+                  return S3Uploader.upload(value).then(function(filename) {
+                    scope.model[fileIndex].remote_file_url = filename;
+                    if (scope.afterUpload) {
+                      return scope.afterUpload({
+                        file: scope.model[fileIndex]
+                      });
+                    }
+                  }, function(rejection) {
+                    scope.model[fileIndex].error = rejection;
+                    return scope.model[fileIndex].upload_progress = 0;
+                  }, function(progress) {
+                    return scope.model[fileIndex].upload_progress = progress;
+                  });
+                });
+              } else {
+                setProgress({
                   progress: 0
                 });
-              }, function(progress) {
-                return fieldName.assign(scope.$parent, {
-                  progress: progress
+                return S3Uploader.upload(values[0]).then(function(filename) {
+                  scope.model = filename;
+                  if (scope.afterUpload) {
+                    return scope.afterUpload({
+                      file: scope.model
+                    });
+                  }
+                }, function(rejection) {
+                  return setProgress({
+                    error: rejection,
+                    progress: 0
+                  });
+                }, function(progress) {
+                  return setProgress({
+                    progress: progress
+                  });
                 });
-              });
+              }
             }
           });
         }
