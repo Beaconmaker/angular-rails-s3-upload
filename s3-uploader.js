@@ -76,7 +76,7 @@
           elem.removeAttr('multiple');
           elem.attr('ng-model', 'file');
           if (!elem.attr('accept')) {
-            elem.attr('accept', 'image/*');
+            elem.attr('accept', '.p12,image/*');
           }
           elem.attr('ng-multiple', (_ref = isMultiple) != null ? _ref : {
             'true': 'false'

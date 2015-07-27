@@ -61,7 +61,7 @@ angular.module('s3-uploader', [])
       elem.removeAttr 'multiple'
 
       elem.attr 'ng-model',       'file'
-      elem.attr('accept', 'image/*') if !elem.attr('accept')
+      elem.attr('accept', '.p12,image/*') if !elem.attr('accept')
       elem.attr 'ng-multiple',    (isMultiple) ? 'true' : 'false'
 
       $compile(elem)(scope)
